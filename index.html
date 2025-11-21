@@ -3,263 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scraper Mercado Libre</title>
+    <title>Scraper Mercado Libre IA</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #fff9e6 0%, #ffe066 100%);
-            min-height: 100vh;
-            padding: 20px;
+            min-height: 100vh; padding: 20px; margin: 0;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: #ffe600;
-            padding: 30px;
-            border-radius: 15px 15px 0 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 2em;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header p {
-            color: #555;
-            margin-top: 10px;
-        }
-
-        .search-container {
-            background: white;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-        }
-
-        #searchInput {
-            flex: 1;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #searchInput:focus {
-            border-color: #ffe600;
-        }
-
-        #searchBtn {
-            padding: 15px 30px;
-            background: #ffe600;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        #searchBtn:hover {
-            background: #ffd700;
-        }
-
-        #searchBtn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #ffe600;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #fee;
-            border-left: 4px solid #f44;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 8px;
-            color: #c33;
-        }
-
-        .error-title {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-
-        .error-details {
-            background: #fff;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 10px;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #666;
-            overflow-x: auto;
-        }
-
-        .results-container {
-            background: white;
-            padding: 25px;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .results-header h2 {
-            font-size: 1.5em;
-            color: #333;
-        }
-
-        #exportBtn {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        #exportBtn:hover {
-            background: #45a049;
-        }
-
-        .product-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: border-color 0.3s;
-        }
-
-        .product-card:hover {
-            border-color: #ffe600;
-        }
-
-        .product-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .product-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .product-price {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #00a650;
-        }
-
-        .free-shipping {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .product-link {
-            margin-left: auto;
-            padding: 10px 20px;
-            background: #3483fa;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .product-link:hover {
-            background: #2968c8;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 0 0 15px 15px;
-            color: #999;
-        }
-
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        #results {
-            display: none;
-        }
-
-        #results.show {
-            display: block;
-        }
-
-        .debug-info {
-            background: #f0f0f0;
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 0.85em;
-            max-height: 200px;
-            overflow-y: auto;
-        }
+        .container { max-width: 800px; margin: 0 auto;}
+        .header { background: #ffe600; padding: 30px; border-radius: 15px 15px 0 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .header h1 { font-size: 2em; color: #333; display: flex; align-items: center; gap: 15px;}
+        .header p { color: #555; margin-top: 10px;}
+        .search-container { background: white; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .search-box { display: flex; gap: 10px;}
+        #searchInput { flex: 1; padding: 15px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;}
+        #searchInput:focus { border-color: #ffe600;}
+        #searchBtn { padding: 15px 30px; background: #ffe600; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s;}
+        #searchBtn:hover { background: #ffd700;}
+        #searchBtn:disabled { opacity: 0.5; cursor: not-allowed;}
+        .loading { text-align: center; padding: 40px; background: white; margin-top: 20px; border-radius: 8px;}
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #ffe600; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);}}
+        .error { background: #fee; border-left: 4px solid #f44; padding: 20px; margin-top: 20px; border-radius: 8px; color: #c33;}
+        .error-title { font-weight: bold; font-size: 1.1em; margin-bottom: 10px;}
+        .error-details { background: #fff; padding: 10px; border-radius: 4px; margin-top: 10px; font-family: monospace; font-size: 0.9em; color: #666; overflow-x: auto;}
+        .results-container { background: white; padding: 25px; border-radius: 0 0 15px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+        .results-header h2 { font-size: 1.5em; color: #333; }
+        #exportBtn { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.3s;}
+        #exportBtn:hover { background: #45a049; }
+        .pretty-json { background:#222; color:#eaffea; border-radius:6px; padding:16px; margin-top:20px; font-size:0.94em; max-width:100%; overflow:auto; white-space:pre-wrap;}
+        .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 0 0 15px 15px; color: #999;}
+        .empty-state svg { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.3;}
+        #results { display: none;}
+        #results.show { display: block;}
     </style>
 </head>
 <body>
@@ -270,9 +47,9 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
-                Scraper de Mercado Libre
+                Scraper de Mercado Libre IA
             </h1>
-            <p>Extrae información de productos automáticamente con IA</p>
+            <p>Extrae información de productos generada por IA</p>
         </div>
 
         <div class="search-container">
@@ -280,7 +57,7 @@
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Ej: laptop gaming, iphone 15, auriculares bluetooth..."
+                    placeholder="Ej: laptop, iphone 15, audífonos bluetooth..."
                 >
                 <button id="searchBtn">🔍 Buscar</button>
             </div>
@@ -288,8 +65,8 @@
 
         <div id="loading" class="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>Buscando productos en Mercado Libre...</p>
-            <p style="font-size: 0.9em; color: #666; margin-top: 10px;">Esto puede tomar 10-30 segundos</p>
+            <p>Buscando productos con IA...</p>
+            <p style="font-size: 0.9em; color: #666; margin-top: 10px;">Esto puede tardar 10-30 segundos</p>
         </div>
 
         <div id="error" class="error" style="display: none;">
@@ -300,53 +77,40 @@
         <div id="results">
             <div class="results-container">
                 <div class="results-header">
-                    <h2>Resultados (<span id="resultCount">0</span>)</h2>
-                    <button id="exportBtn">📥 Exportar CSV</button>
+                    <h2>Respuesta IA</h2>
                 </div>
-                <div id="productList"></div>
+                <pre id="prettyResponse" class="pretty-json"></pre>
             </div>
         </div>
-
         <div id="emptyState" class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
             </svg>
             <p style="font-size: 1.2em; margin-bottom: 10px;">Ingresa un término de búsqueda para comenzar</p>
-            <p style="font-size: 0.9em;">Ejemplos: "laptop", "celular samsung", "monitor gamer"</p>
+            <p style="font-size: 0.9em;">Ejemplo: "laptop", "monitor gamer", "audífonos bluetooth"</p>
         </div>
     </div>
-
     <script>
-        let currentResults = [];
-
         const searchInput = document.getElementById('searchInput');
         const searchBtn = document.getElementById('searchBtn');
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
         const results = document.getElementById('results');
         const emptyState = document.getElementById('emptyState');
-        const productList = document.getElementById('productList');
-        const resultCount = document.getElementById('resultCount');
-        const exportBtn = document.getElementById('exportBtn');
+        const prettyResponse = document.getElementById('prettyResponse');
 
         searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                buscarProductos();
-            }
+            if (e.key === 'Enter') buscarProductos();
         });
-
         searchBtn.addEventListener('click', buscarProductos);
-        exportBtn.addEventListener('click', exportarCSV);
 
         async function buscarProductos() {
             const query = searchInput.value.trim();
-            
             if (!query) {
                 mostrarError('Campo vacío', 'Por favor ingresa un término de búsqueda');
                 return;
             }
-
             loading.style.display = 'block';
             error.style.display = 'none';
             results.classList.remove('show');
@@ -354,140 +118,42 @@
             searchBtn.disabled = true;
             searchBtn.textContent = '⏳ Buscando...';
 
-            console.log('Iniciando búsqueda para:', query);
-
             try {
-                console.log('Haciendo petición a la API...');
-             
-                const response = await fetch("http://localhost:3000/api/huggingface", {
+                const response = await fetch("http://localhost:3000/api/openrouter", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                            inputs: `Busca información sobre "${query}" en Mercado Libre México. Usa web_search para buscar "mercado libre ${query}" y luego extrae información de los productos que encuentres. Responde SOLO en formato JSON válido así:
-{
-  "productos": [
-    {
-      "titulo": "nombre del producto",
-      "precio": "$XX,XXX",
-      "url": "https://...",
-      "envioGratis": true
-    }
-  ]
-}
-
-IMPORTANTE: Responde SOLO el JSON, sin texto adicional, sin backticks, sin explicaciones.`
-                       
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inputs: query })
                 });
-
-                console.log('Respuesta recibida, status:', response.status);
-
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`Error HTTP ${response.status}: ${errorText}`);
                 }
-
                 const data = await response.json();
-                console.log('Datos parseados:', data);
-                
-                let jsonText = data.content
-                    .filter(item => item.type === 'text')
-                    .map(item => item.text)
-                    .join('');
+                let modelText = data.choices?.[0]?.message?.content || "";
 
-                console.log('Texto extraído:', jsonText.substring(0, 200) + '...');
+                // Limpia los backticks y la palabra “json”
+                modelText = modelText.replace(/``````/g, '').trim();
 
-                jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-                
-                const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-                
-                if (jsonMatch) {
-                    console.log('JSON encontrado, parseando...');
-                    const parsed = JSON.parse(jsonMatch[0]);
-                    currentResults = parsed.productos || [];
-                    
-                    if (currentResults.length > 0) {
-                        console.log('Productos encontrados:', currentResults.length);
-                        mostrarResultados(currentResults);
-                    } else {
-                        mostrarError('Sin resultados', 'No se encontraron productos para esta búsqueda. Intenta con otros términos.');
-                    }
-                } else {
-                    console.log('No se pudo encontrar JSON en la respuesta');
-                    mostrarError('Error de formato', 'La respuesta no contiene datos válidos. Respuesta completa: ' + jsonText.substring(0, 500));
-                }
-
+                prettyResponse.textContent = modelText;
+                results.classList.add('show');
+                emptyState.style.display = 'none';
             } catch (err) {
-                console.error('Error completo:', err);
-                mostrarError(
-                    'Error al buscar productos',
-                    err.message,
-                    err.stack
-                );
+                mostrarError('Error al buscar productos', err.message || err, '');
+                prettyResponse.textContent = '';
             } finally {
                 loading.style.display = 'none';
                 searchBtn.disabled = false;
-                searchBtn.innerHTML = '🔍 Buscar';
+                searchBtn.textContent = '🔍 Buscar';
             }
         }
-
-        function mostrarResultados(productos) {
-            resultCount.textContent = productos.length;
-            productList.innerHTML = '';
-
-            productos.forEach((producto) => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="product-title">${producto.titulo || 'Sin título'}</div>
-                    <div class="product-info">
-                        <span class="product-price">${producto.precio || 'Precio no disponible'}</span>
-                        ${producto.envioGratis ? '<span class="free-shipping">Envío Gratis</span>' : ''}
-                        ${producto.url ? `<a href="${producto.url}" target="_blank" rel="noopener noreferrer" class="product-link">Ver en ML</a>` : ''}
-                    </div>
-                `;
-                productList.appendChild(card);
-            });
-
-            results.classList.add('show');
-            emptyState.style.display = 'none';
-        }
-
         function mostrarError(titulo, mensaje, detalles = '') {
             const errorTitle = error.querySelector('.error-title');
             const errorDetails = error.querySelector('.error-details');
-            
             errorTitle.textContent = '⚠️ ' + titulo;
             errorDetails.innerHTML = mensaje;
-            
-            if (detalles) {
-                errorDetails.innerHTML += '<div class="debug-info">' + detalles + '</div>';
-            }
-            
             error.style.display = 'block';
             console.error(titulo, mensaje, detalles);
         }
-
-        function exportarCSV() {
-            if (currentResults.length === 0) return;
-
-            const headers = ['Título', 'Precio', 'URL', 'Envío Gratis'];
-            const csvContent = [
-                headers.join(','),
-                ...currentResults.map(p => 
-                    `"${(p.titulo || '').replace(/"/g, '""')}","${p.precio || ''}","${p.url || ''}","${p.envioGratis ? 'Sí' : 'No'}"`
-                )
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `mercadolibre_${searchInput.value}_${Date.now()}.csv`;
-            link.click();
-        }
-
         console.log('Scraper cargado correctamente ✓');
     </script>
 </body>
