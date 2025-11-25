@@ -55,8 +55,22 @@ def scrap_meli(query):
 @app.route('/api/llantas', methods=['GET'])
 def endpoint_llantas():
     query = request.args.get('q', '')
-    productos = scrap_meli(query)
-    return jsonify(productos)
+    node_api_url = f"http://localhost:3001/api/producto/{query}"
+    respuesta = requests.get(node_api_url)
+
+    if respuesta.status_code == 200:
+        resultado = respuesta.json()
+        body_modelo = resultado.get("bodyModelo", "")
+        if not body_modelo:
+            return jsonify({"error": "No hay bodyModelo para buscar en MELI"}), 404
+        productos_meli = scrap_meli(body_modelo)
+        return jsonify({
+            "sku": resultado.get("sku"),
+            "bodyModelo": body_modelo,
+            "productos_meli": productos_meli
+        })
+    else:
+        return jsonify({"error": "No se pudo obtener el producto"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
