@@ -1,160 +1,148 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scraper Mercado Libre IA</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #fff9e6 0%, #ffe066 100%);
-            min-height: 100vh; padding: 20px; margin: 0;
-        }
-        .container { max-width: 800px; margin: 0 auto;}
-        .header { background: #ffe600; padding: 30px; border-radius: 15px 15px 0 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-        .header h1 { font-size: 2em; color: #333; display: flex; align-items: center; gap: 15px;}
-        .header p { color: #555; margin-top: 10px;}
-        .search-container { background: white; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-        .search-box { display: flex; gap: 10px;}
-        #searchInput { flex: 1; padding: 15px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;}
-        #searchInput:focus { border-color: #ffe600;}
-        #searchBtn { padding: 15px 30px; background: #ffe600; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s;}
-        #searchBtn:hover { background: #ffd700;}
-        #searchBtn:disabled { opacity: 0.5; cursor: not-allowed;}
-        .loading { text-align: center; padding: 40px; background: white; margin-top: 20px; border-radius: 8px;}
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #ffe600; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;}
-        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);}}
-        .error { background: #fee; border-left: 4px solid #f44; padding: 20px; margin-top: 20px; border-radius: 8px; color: #c33;}
-        .error-title { font-weight: bold; font-size: 1.1em; margin-bottom: 10px;}
-        .error-details { background: #fff; padding: 10px; border-radius: 4px; margin-top: 10px; font-family: monospace; font-size: 0.9em; color: #666; overflow-x: auto;}
-        .results-container { background: white; padding: 25px; border-radius: 0 0 15px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
-        .results-header h2 { font-size: 1.5em; color: #333; }
-        #exportBtn { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.3s;}
-        #exportBtn:hover { background: #45a049; }
-        .pretty-json { background:#222; color:#eaffea; border-radius:6px; padding:16px; margin-top:20px; font-size:0.94em; max-width:100%; overflow:auto; white-space:pre-wrap;}
-        .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 0 0 15px 15px; color: #999;}
-        .empty-state svg { width: 80px; height: 80px; margin-bottom: 20px; opacity: 0.3;}
-        #results { display: none;}
-        #results.show { display: block;}
-    </style>
+  <meta charset="UTF-8">
+  <title>Buscador de Llantas Goodyear</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8fafc;
+      color: #222;
+      padding: 32px 0;
+    }
+    h2 {
+      margin-bottom: 0.7em;
+      text-align: center;
+    }
+    .buscador {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    input[type="text"] {
+      font-size: 1rem;
+      padding: 8px;
+      width: 300px;
+      border: 1px solid #ccd;
+      border-radius: 6px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: #2c82e8;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+      border-radius: 6px;
+      border: none;
+      padding: 9px 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    #resultados {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    table {
+      background: #fff;
+      border-collapse: collapse;
+      min-width: 700px;
+      box-shadow: 0 3px 20px #ccd4e1;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #eef2f6;
+      text-align: center;
+    }
+    th {
+      background: #f1f5fd;
+      font-weight: 600;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover {
+      background: #e8f0fe;
+    }
+    img {
+      max-width: 72px;
+      border-radius: 8px;
+      box-shadow: 0 1px 8px #cad3e1;
+    }
+    .sin-imagen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 72px;
+      color: #aaa;
+      font-size: 2em;
+    }
+    .error, .mensaje {
+      text-align: center;
+      color: #d7263d;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                Scraper de Mercado Libre IA
-            </h1>
-            <p>Extrae información de productos generada por IA</p>
-        </div>
+  <h2>Busca llantas por modelo</h2>
+  <div class="buscador">
+    <input type="text" id="query" placeholder="Ejemplo: 185/65/R15 Goodyear Assurance 88T" />
+    <button onclick="buscar()">Buscar</button>
+  </div>
+  <div id="resultados"></div>
 
-        <div class="search-container">
-            <div class="search-box">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Ej: laptop, iphone 15, audífonos bluetooth..."
-                >
-                <button id="searchBtn">🔍 Buscar</button>
-            </div>
-        </div>
-
-        <div id="loading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>Buscando productos con IA...</p>
-            <p style="font-size: 0.9em; color: #666; margin-top: 10px;">Esto puede tardar 10-30 segundos</p>
-        </div>
-
-        <div id="error" class="error" style="display: none;">
-            <div class="error-title"></div>
-            <div class="error-details"></div>
-        </div>
-
-        <div id="results">
-            <div class="results-container">
-                <div class="results-header">
-                    <h2>Respuesta IA</h2>
-                </div>
-                <pre id="prettyResponse" class="pretty-json"></pre>
-            </div>
-        </div>
-        <div id="emptyState" class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <p style="font-size: 1.2em; margin-bottom: 10px;">Ingresa un término de búsqueda para comenzar</p>
-            <p style="font-size: 0.9em;">Ejemplo: "laptop", "monitor gamer", "audífonos bluetooth"</p>
-        </div>
-    </div>
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const loading = document.getElementById('loading');
-        const error = document.getElementById('error');
-        const results = document.getElementById('results');
-        const emptyState = document.getElementById('emptyState');
-        const prettyResponse = document.getElementById('prettyResponse');
-
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') buscarProductos();
+  <script>
+    function buscar() {
+      const q = document.getElementById('query').value.trim();
+      if (!q) {
+        document.getElementById('resultados').innerHTML = "<div class='mensaje'>Introduce un modelo de llanta y haz click en buscar.</div>";
+        return;
+      }
+      document.getElementById('resultados').innerHTML = "<div class='mensaje'>Buscando...</div>";
+      fetch('http://127.0.0.1:5000/api/llantas?q=' + encodeURIComponent(q))
+        .then(r => r.json())
+        .then(data => {
+          if (!data.length) {
+            document.getElementById('resultados').innerHTML = "<div class='mensaje'>No se encontraron resultados.</div>";
+            return;
+          }
+          let html = `<table><thead><tr><th>Miniatura</th><th>Título</th><th>Precio</th><th>Enlace</th></tr></thead><tbody>`;
+          data.forEach(p => {
+            // Detecta el pixel transparente base64 (Sin imagen)
+            let esPixelVacio = p.thumbnail && p.thumbnail.startsWith('data:image');
+            let thumb = (!p.thumbnail || esPixelVacio)
+              ? `<span class="sin-imagen" title="Sin imagen">
+                   <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+                     <rect width="24" height="24" fill="#f1f1f1"/>
+                     <path stroke="#aaa" stroke-width="2" d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/>
+                     <path stroke="#aaa" stroke-width="1.5" d="M3 17.5L9.5 11l4 4 5.5-6.5"/>
+                   </svg>
+                 </span>`
+              : `<img src="${p.thumbnail}" alt="miniatura">`;
+            html += `<tr>
+              <td>${thumb}</td>
+              <td>${p.titulo || '(Sin título)'}</td>
+              <td>$${p.precio}</td>
+              <td><a href="${p.url}" target="_blank">Ver producto</a></td>
+            </tr>`;
+          });
+          html += `</tbody></table>`;
+          document.getElementById('resultados').innerHTML = html;
+        }).catch(error => {
+          document.getElementById('resultados').innerHTML = `<div class="error">Error cargando resultados: ${error}</div>`;
         });
-        searchBtn.addEventListener('click', buscarProductos);
-
-        async function buscarProductos() {
-            const query = searchInput.value.trim();
-            if (!query) {
-                mostrarError('Campo vacío', 'Por favor ingresa un término de búsqueda');
-                return;
-            }
-            loading.style.display = 'block';
-            error.style.display = 'none';
-            results.classList.remove('show');
-            emptyState.style.display = 'none';
-            searchBtn.disabled = true;
-            searchBtn.textContent = '⏳ Buscando...';
-
-            try {
-                const response = await fetch("http://localhost:3000/api/openrouter", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ inputs: query })
-                });
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Error HTTP ${response.status}: ${errorText}`);
-                }
-                const data = await response.json();
-                let modelText = data.choices?.[0]?.message?.content || "";
-
-                // Limpia los backticks y la palabra “json”
-                modelText = modelText.replace(/``````/g, '').trim();
-
-                prettyResponse.textContent = modelText;
-                results.classList.add('show');
-                emptyState.style.display = 'none';
-            } catch (err) {
-                mostrarError('Error al buscar productos', err.message || err, '');
-                prettyResponse.textContent = '';
-            } finally {
-                loading.style.display = 'none';
-                searchBtn.disabled = false;
-                searchBtn.textContent = '🔍 Buscar';
-            }
-        }
-        function mostrarError(titulo, mensaje, detalles = '') {
-            const errorTitle = error.querySelector('.error-title');
-            const errorDetails = error.querySelector('.error-details');
-            errorTitle.textContent = '⚠️ ' + titulo;
-            errorDetails.innerHTML = mensaje;
-            error.style.display = 'block';
-            console.error(titulo, mensaje, detalles);
-        }
-        console.log('Scraper cargado correctamente ✓');
-    </script>
+    }
+  </script>
 </body>
 </html>
