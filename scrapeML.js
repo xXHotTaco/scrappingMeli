@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 import dotenv from 'dotenv';
+import { modeloBySku } from './producto.js';
 
 dotenv.config();
 
@@ -48,19 +49,36 @@ async function scrapeML(query) {
   }).get();
 }
 
-const queries = [
-    "185/65/R15 Goodyear Assurance",
-    "205/55/R16 Goodyear Eagle Sport 2",
-    "195/55/R16 Goodyear Eagle Sport 2",
-    "205/55/R16 Dunlop Sport Bluresponse",
-    "185/60/R15 Kumho Ecowing Es31"
-];
 
-(async () => {
-  const results = await Promise.all(queries.map(q => scrapeML(q)));
+export {scrapeML}
 
-  results.forEach((products, idx) => {
-    console.log(`\n========== Resultados para: ${queries[idx]} ==========\n`);
-    products.forEach((prod, i) => console.log(`${i + 1}. ${prod.title}\n   ${prod.price}   ${prod.url}\n`));
-  });
-})();
+
+
+// const queries = [
+//     "185/65/R15 Goodyear Assurance",
+//     "205/55/R16 Goodyear Eagle Sport 2",
+//     "195/55/R16 Goodyear Eagle Sport 2",
+//     "205/55/R16 Dunlop Sport Bluresponse",
+//     "185/60/R15 Kumho Ecowing Es31"
+// ];
+
+
+// (async () => {
+//   let sku = "PIR2323000"
+//   const result = await modeloBySku(sku)
+//   let modelo = result.bodyModelo
+//   console.log(modelo)
+//   const data = await scrapeML(modelo);
+//   console.log(data);
+// })();
+// (async () => {
+//   const results = await Promise.all(queries.map(q => scrapeML(q)));
+
+//   results.forEach((products, idx) => {
+//     console.log(`\n========== Resultados para: ${queries[idx]} ==========\n`);
+//     products.forEach((prod, i) => console.log(`${i + 1}. ${prod.title}\n   ${prod.price}   ${prod.url}\n`));
+//   });
+// })();
+
+
+
