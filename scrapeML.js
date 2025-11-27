@@ -1,14 +1,35 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 import dotenv from 'dotenv';
-import { modeloBySku } from './producto.js';
 
 dotenv.config();
 
 const BRIGHT_TOKEN = process.env.TOKEN;
 
+// Detecta cantidad (2 llantas, kit de 2, etc.)
+function detectarCantidad(texto) {
+
+  const regexCantidad = [
+    /(\d+)\s*llantas/,           // "2 llantas"
+    /kit\s*con\s*(\d+)/,          // "kit con 2"
+    /kit\s*de\s*(\d+)/,          // "kit de 2"
+    /paquete\s*(\d+)/,           // "paquete 2"
+    /\b(\d+)\s*pzs?\b/,          // "2 pzs"
+    /\b(\d+)\s*x\s*\d+\b/,       // "2x2"
+  ];
+
+  for (const r of regexCantidad) {
+    const match = texto.match(r);
+    if (match) return parseInt(match[1]);
+  }
+
+  return 1; // Default: 1 llanta
+}
+
 async function scrapeML(query) {
+  //console.log(query)
   const url = `https://listado.mercadolibre.com.mx/${query.replace(/ /g, '-')}`;
+  
   const response = await fetch('https://api.brightdata.com/request', {
     method: 'POST',
     headers: {
@@ -32,53 +53,55 @@ async function scrapeML(query) {
 
   const $ = cheerio.load(html);
 
-  // Buscar los productos
-  return $('.ui-search-result__wrapper').slice(0, 5).map((i, el) => {
-    // Intenta diferentes selectores para el título
+  // Traer resultados sin filtrar
+  let resultados = $('.ui-search-result__wrapper').map((i, el) => {
+    // Título
     let title =
-      $(el).find('.ui-search-item__title').text().trim() ||
-      $(el).find('.ui-search-item__group__element > h2').text().trim() ||
-      $(el).find('h2').text().trim() ||
-      $(el).find('a[title]').attr('title') ||
-      $(el).find('img').attr('alt') || "";
+      $(el).find(".ui-search-item__group__element > h2").text().trim() ||
+      $(el).find(".ui-search-item__title").text().trim() ||
+      $(el).find("h2").text().trim() ||
+      $(el).find("a[title]").attr("title") ||
+      $(el).find("img").attr("alt") ||
+      "";
 
-    const price = $(el).find('.andes-money-amount__fraction').first().text().trim() || "";
+    //console.log("Titulo:", title);
+
+    // Detectar estado (usado / nuevo)
+    const estado = $(el).text().toLowerCase();
+
+    //console.log("completo:", title + ' ' + estado);
+
+    if (estado.includes("usado")) {
+      //console.log("❌ Usado → descartado:", title);
+      return null;
+    }
+
+    // Precio
+    const priceText = $(el).find('.andes-money-amount__fraction').first().text().trim();
     const url = $(el).find('a').attr('href') || "";
 
-    return { title, price, url };
+    let price = parseFloat(priceText.replace(/,/g, "")) || 0;
+
+    // Detectar cuántas llantas incluye
+    const cantidad = detectarCantidad(title);
+
+    let unitPrice = price;
+    if (cantidad > 1) {
+      unitPrice = price / cantidad;
+      price = unitPrice;
+    }
+
+    return { title, price, cantidad, unitPrice, url };
   }).get();
+
+  // Ordenar por precio unitario (menor a mayor)
+  resultados.sort((a, b) => a.unitPrice - b.unitPrice);
+  // console.log("este: ", resultados)
+  // console.log(resultados.slice(0, 5))
+
+  // Regresar top 5 más baratos
+  return resultados.slice(0, 5);
 }
 
 
-export {scrapeML}
-
-
-
-// const queries = [
-//     "185/65/R15 Goodyear Assurance",
-//     "205/55/R16 Goodyear Eagle Sport 2",
-//     "195/55/R16 Goodyear Eagle Sport 2",
-//     "205/55/R16 Dunlop Sport Bluresponse",
-//     "185/60/R15 Kumho Ecowing Es31"
-// ];
-
-
-// (async () => {
-//   let sku = "PIR2323000"
-//   const result = await modeloBySku(sku)
-//   let modelo = result.bodyModelo
-//   console.log(modelo)
-//   const data = await scrapeML(modelo);
-//   console.log(data);
-// })();
-// (async () => {
-//   const results = await Promise.all(queries.map(q => scrapeML(q)));
-
-//   results.forEach((products, idx) => {
-//     console.log(`\n========== Resultados para: ${queries[idx]} ==========\n`);
-//     products.forEach((prod, i) => console.log(`${i + 1}. ${prod.title}\n   ${prod.price}   ${prod.url}\n`));
-//   });
-// })();
-
-
-
+export { scrapeML };
