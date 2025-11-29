@@ -23,7 +23,7 @@ async function modeloBySku(sku) {
 
     // Crear el string del producto
     // Ejemplo '255/55/19 Pirelli Scorpion Verde'
-    const bodyModelo = `${width}/${height}/${rin} ${brand} ${model}`;
+    const bodyModelo = `${width}/${height}/r${rin} ${brand} ${model}`;
 
     return {
       sku,

@@ -11,10 +11,14 @@ function leerSkus(ruta) {
 }
 
 function guardarCSV(ruta, datos) {
-  const headers = "sku,title,price,url\n";
+  const headers = "sku,title,price,url,tipo\n";
+
+  const sanitize = (text) =>
+    String(text)
+      .replace(/"/g, '""'); // CSV escape
 
   const lineas = datos.map(d =>
-    `"${d.sku}","${d.title}","${d.price}","${d.url}"`
+    `"${sanitize(d.sku)}","${sanitize(d.title)}","${sanitize(d.price)}","${sanitize(d.url)}","${sanitize(d.tipo || "")}"`
   );
 
   fs.writeFileSync(ruta, headers + lineas.join("\n"), "utf8");

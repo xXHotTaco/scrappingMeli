@@ -35,14 +35,27 @@ export async function ejecutarProceso() {
         continue;
       }
 
-      productos.forEach((p) => {
+      // Agregar top 5
+      productos.top5.forEach((p) => {
         resultadosFinales.push({
           sku,
           title: p.title,
           price: p.price,
           url: p.url,
+          tipo: "",
         });
       });
+
+      // Agregar el más caro
+      if (productos.masCaro) {
+        resultadosFinales.push({
+          sku,
+          title: productos.masCaro.title,
+          price: productos.masCaro.price,
+          url: productos.masCaro.url,
+          tipo: "precio alto",
+        });
+      }
     }
   }
 
@@ -55,7 +68,7 @@ export async function ejecutarProceso() {
   await Promise.all(pool);
 
   // Guardar resultados
-  guardarCSV("./resultado2.csv", resultadosFinales);
+  guardarCSV("./resultado4.csv", resultadosFinales);
 
   const end = performance.now();
   const seconds = ((end - start) / 1000).toFixed(2);
