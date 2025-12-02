@@ -12,7 +12,9 @@ function detectarCantidad(texto) {
     /(\d+)\s*llantas/,
     /kit\s*con\s*(\d+)/,
     /kit\s*de\s*(\d+)/,
+    /kit\s*(\d+)\s*llantas/i,
     /paquete\s*(\d+)/,
+    /paquete\s*(\d+)\s*llantas/i,
     /\b(\d+)\s*pzs?\b/,
     /\b(\d+)\s*x\s*\d+\b/,
   ];
@@ -26,8 +28,8 @@ function detectarCantidad(texto) {
 }
 
 async function scrapeML(query) {
+  query = query.replaceAll("/", "-")
   console.log(query)
-  query += " 1 pieza";
   const url = `https://listado.mercadolibre.com.mx/${query.replace(/ /g, "-")}`;
   console.log(url)
 
@@ -54,7 +56,7 @@ async function scrapeML(query) {
 
   const $ = cheerio.load(html);
 
-  let resultados = $(".ui-search-result__wrapper")
+  let resultados = $(".ui-search-layout__item, [data-testid='item']")
     .map((i, el) => {
       let title =
         $(el).find(".ui-search-item__group__element > h2").text().trim() ||
